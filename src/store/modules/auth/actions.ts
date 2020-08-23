@@ -1,13 +1,20 @@
 import { action } from "typesafe-actions";
 
-interface ISignIn {
-  email: string;
-  password: string;
-}
+import { IUser, AuthTypes, IAuthData } from "./types";
 
-export function signInRequest({ email, password }: ISignIn) {
-  return action('@auth/SIGN_IN_REQUEST', {
+export function signInRequest({ email, password }: IUser) {
+  return action(AuthTypes.SIGN_IN_REQUEST, {
     email,
     password,
   });
+}
+
+export function signInSuccess(data: IAuthData) {
+  return action(AuthTypes.SIGN_IN_SUCCESS, {
+    data,
+  });
+}
+
+export function signInFailure() {
+  return action(AuthTypes.SIGN_IN_FAILURE);
 }

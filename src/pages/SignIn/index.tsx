@@ -1,4 +1,4 @@
-import React, { useCallback, useState, FormEvent } from 'react';
+import React, { useCallback, useState, FormEvent, ChangeEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { StoreState } from '../../store/createStore';
@@ -10,42 +10,44 @@ interface ISignInValues {
 }
 
 const SignIn: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [values, setValues] = useState({
+    email: 'test@email.com',
+    password: '12345678',
+  } as ISignInValues);
 
-  const { isSignedIn, loadingSignInRequest } = useSelector((state: StoreState) => state.auth);
+  const { loading, data, error } = useSelector((state: StoreState) => state.auth);
   const dispatch = useDispatch();
 
-  console.log(loadingSignInRequest);
+  console.log(loading, data, error);
+
+  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, [event.target.name]: event.target.value });
+  }, [values]);
 
   const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
-    if (!isSignedIn) {
-      dispatch(signInRequest({
-        email,
-        password,
-      }));
-    }
-  }, [email, password, isSignedIn, dispatch]);
+    dispatch(signInRequest(values));
+  }, [values, dispatch]);
 
   return (
     <form onSubmit={handleSubmit}>
       <h1>Faça o seu logon</h1>
       <input
+        type="email"
         name="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        defaultValue={'johndoe@example.com'}
+        value={values.email}
+        onChange={handleChange}
       />
       <input
         type="password"
         name="password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        defaultValue={'secret'}
+        value={values.password}
+        onChange={handleChange}
       />
-      <button type="submit">Entrar</button>
+      <button type="submit">
+        {loading ? 'Carregando...' : 'Entrar'}
+      </button>
     </form>
   );
 };
